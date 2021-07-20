@@ -14,7 +14,7 @@ class Atendimento{
             {
                 nome: 'data',
                 valido: dateIsValid,
-                mensagem: `Data deve ser igual ou maior a ${moment()}`
+                mensagem: `Data deve ser igual ou maior a atual`
             },
             {
                 nome: 'cliente',
@@ -36,7 +36,7 @@ class Atendimento{
                 if(err){
                     res.status(400).json(err);
                 } else {
-                    res.status(201).json(result);
+                    res.status(201).json(atendimento);
                 }
             });
         }
@@ -60,8 +60,36 @@ class Atendimento{
         const sql = `SELECT * FROM Atendimento WHERE id=${id}`;
 
         conexao.query(sql, (err, result)=> {
+            const atendimento = result[0];
             if (err){
                 res.status(404).json(err);
+            } else {
+                res.status(200).json(atendimento);
+            }
+        });
+    }
+
+    update(id, valores, res){
+        if(valores.data){
+           valores.data = moment(valores.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
+        }
+        const sql = "UPDATE Atendimento SET ? WHERE id=?";
+
+        conexao.query(sql, [valores, id], (err, result) => {
+            if (err){
+                res.status(400).json(err);
+            } else {
+                res.status(200).json({...valores, id});
+            }
+        });
+    }
+
+    delete(id, res){
+        const sql = 'DELETE FROM Atendimento WHERE ID=?';
+
+        conexao.query(sql, id, (err, result) => {
+            if (err){
+                res.status(400).json(err);
             } else {
                 res.status(200).json(result);
             }
