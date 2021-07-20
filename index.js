@@ -1,8 +1,17 @@
-const express = require('express');
-const app = express();
+const customExpress = require('./config/customExpress');
+const conexao = require('./infraestrutura/conexao');
+const tabelas = require('./infraestrutura/table')
 
-app.get('/', (req, res)=>{
-    res.send("Ola Gostaria de Adicionar um Lembrente!");
-});
 
-app.listen(3000, ()=> console.log("rodando na porta 3000"));
+conexao.connect(erro => {
+    if (erro){
+        console.log(erro);
+    } else {
+        console.log("Conectado com sucesso");
+
+        tabelas.init(conexao);
+
+        const app = customExpress();
+        app.listen(3000, ()=> console.log("rodando na porta 3000"));
+    }
+})
